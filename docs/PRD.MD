@@ -1,8 +1,8 @@
 # Community Forum Platform - Product Requirements Document (PRD)
 
-**Version:** 1.0  
-**Last Updated:** December 30, 2024  
-**Project Status:** MVP Development Phase  
+**Version:** 1.0
+**Last Updated:** December 30, 2024
+**Project Status:** MVP Development Phase
 **Team:** 2 developers (Frontend: Next.js | Backend: 3 years experience)
 
 ---
@@ -37,6 +37,7 @@ A **minimal, fast, and welcoming community forum platform** where users can crea
 - **Diverse:** Support for any topic/community
 
 ### Core User Flow
+
 ```
 1. User visits homepage → Sees feed of posts
 2. User can browse/search without account
@@ -130,6 +131,7 @@ A **minimal, fast, and welcoming community forum platform** where users can crea
 **Purpose:** Create a new user account
 
 **Request Body:**
+
 ```json
 {
   "username": "string",
@@ -139,7 +141,8 @@ A **minimal, fast, and welcoming community forum platform** where users can crea
 ```
 
 **Validation Rules:**
-- `username`: 
+
+- `username`:
   - Required
   - 3-20 characters
   - Alphanumeric + underscore only
@@ -155,6 +158,7 @@ A **minimal, fast, and welcoming community forum platform** where users can crea
   - Used for account security/2FA only (NOT for login)
 
 **Success Response (201):**
+
 ```json
 {
   "user": {
@@ -168,6 +172,7 @@ A **minimal, fast, and welcoming community forum platform** where users can crea
 ```
 
 **Error Responses:**
+
 ```json
 // 400 - Username taken
 {
@@ -195,6 +200,7 @@ A **minimal, fast, and welcoming community forum platform** where users can crea
 **Purpose:** Authenticate user and return session token
 
 **Request Body:**
+
 ```json
 {
   "username": "string",
@@ -203,6 +209,7 @@ A **minimal, fast, and welcoming community forum platform** where users can crea
 ```
 
 **Success Response (200):**
+
 ```json
 {
   "user": {
@@ -215,6 +222,7 @@ A **minimal, fast, and welcoming community forum platform** where users can crea
 ```
 
 **Error Response (401):**
+
 ```json
 {
   "error": "Invalid username or password",
@@ -231,11 +239,13 @@ A **minimal, fast, and welcoming community forum platform** where users can crea
 **Purpose:** Invalidate user session
 
 **Headers Required:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Success Response (200):**
+
 ```json
 {
   "message": "Logged out successfully"
@@ -249,11 +259,13 @@ Authorization: Bearer <token>
 **Purpose:** Get current authenticated user info
 
 **Headers Required:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Success Response (200):**
+
 ```json
 {
   "id": "uuid",
@@ -264,6 +276,7 @@ Authorization: Bearer <token>
 ```
 
 **Error Response (401):**
+
 ```json
 {
   "error": "Not authenticated",
@@ -282,17 +295,20 @@ Authorization: Bearer <token>
 **Purpose:** Get paginated feed of posts
 
 **Query Parameters:**
+
 - `sort` (optional): `"hot"` | `"new"` | `"top"` (default: `"hot"`)
 - `topic_id` (optional): UUID to filter by topic
 - `limit` (optional): Number of posts (default: 20, max: 100)
 - `offset` (optional): Pagination offset (default: 0)
 
 **Example Request:**
+
 ```
 GET /api/posts?sort=hot&limit=20&offset=0
 ```
 
 **Success Response (200):**
+
 ```json
 {
   "posts": [
@@ -320,6 +336,7 @@ GET /api/posts?sort=hot&limit=20&offset=0
 ```
 
 **Field Explanations:**
+
 - `user_vote`: Only included if user is authenticated
   - `1` = user upvoted
   - `-1` = user downvoted
@@ -330,17 +347,21 @@ GET /api/posts?sort=hot&limit=20&offset=0
 **Sorting Algorithms:**
 
 **Hot (Default):**
+
 ```
 score = (upvotes - downvotes) / (hours_since_posted + 2)^1.5
 ```
+
 Order by score DESC
 
 **New:**
+
 ```
 Order by created_at DESC
 ```
 
 **Top:**
+
 ```
 Order by vote_count DESC
 ```
@@ -352,11 +373,13 @@ Order by vote_count DESC
 **Purpose:** Create a new post
 
 **Headers Required:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Request Body:**
+
 ```json
 {
   "title": "string",
@@ -366,11 +389,13 @@ Authorization: Bearer <token>
 ```
 
 **Validation Rules:**
+
 - `title`: Required, 5-300 characters
 - `content`: Required, 10-10,000 characters
 - `topic_id`: Required, must be valid topic UUID
 
 **Success Response (201):**
+
 ```json
 {
   "post": {
@@ -393,6 +418,7 @@ Authorization: Bearer <token>
 ```
 
 **Error Responses:**
+
 ```json
 // 401 - Not authenticated
 {
@@ -422,6 +448,7 @@ Authorization: Bearer <token>
 **Purpose:** Get a single post by ID
 
 **Success Response (200):**
+
 ```json
 {
   "id": "uuid",
@@ -443,6 +470,7 @@ Authorization: Bearer <token>
 ```
 
 **Error Response (404):**
+
 ```json
 {
   "error": "Post not found",
@@ -457,11 +485,13 @@ Authorization: Bearer <token>
 **Purpose:** Update a post (owner only)
 
 **Headers Required:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Request Body (all optional):**
+
 ```json
 {
   "title": "string",
@@ -472,6 +502,7 @@ Authorization: Bearer <token>
 **Authorization:** Must be post owner
 
 **Success Response (200):**
+
 ```json
 {
   "post": {
@@ -494,6 +525,7 @@ Authorization: Bearer <token>
 ```
 
 **Error Response (403):**
+
 ```json
 {
   "error": "You don't have permission to edit this post",
@@ -508,6 +540,7 @@ Authorization: Bearer <token>
 **Purpose:** Delete a post (owner only)
 
 **Headers Required:**
+
 ```
 Authorization: Bearer <token>
 ```
@@ -515,6 +548,7 @@ Authorization: Bearer <token>
 **Authorization:** Must be post owner
 
 **Success Response (200):**
+
 ```json
 {
   "message": "Post deleted successfully"
@@ -522,6 +556,7 @@ Authorization: Bearer <token>
 ```
 
 **Error Response (403):**
+
 ```json
 {
   "error": "You don't have permission to delete this post",
@@ -540,11 +575,13 @@ Authorization: Bearer <token>
 **Purpose:** Upvote, downvote, or remove vote from a post
 
 **Headers Required:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Request Body:**
+
 ```json
 {
   "vote": 1
@@ -552,11 +589,13 @@ Authorization: Bearer <token>
 ```
 
 **Vote Values:**
+
 - `1` = Upvote
 - `-1` = Downvote
 - `0` = Remove vote (unvote)
 
 **Business Logic:**
+
 ```
 IF user has no existing vote:
   - Create new vote with value
@@ -575,6 +614,7 @@ ELSE IF user has existing vote:
 ```
 
 **Success Response (200):**
+
 ```json
 {
   "vote_count": 43,
@@ -583,6 +623,7 @@ ELSE IF user has existing vote:
 ```
 
 **Error Response (401):**
+
 ```json
 {
   "error": "Authentication required to vote",
@@ -603,6 +644,7 @@ ELSE IF user has existing vote:
 **Purpose:** Get list of all available topics
 
 **Success Response (200):**
+
 ```json
 {
   "topics": [
@@ -625,6 +667,7 @@ ELSE IF user has existing vote:
 ```
 
 **Initial Topics to Seed in Database:**
+
 ```
 1. General - General discussions about anything
 2. Technology - Tech, programming, and gadgets
@@ -651,16 +694,19 @@ ELSE IF user has existing vote:
 **Purpose:** Search posts by keywords
 
 **Query Parameters:**
+
 - `q` (required): Search query string
 - `limit` (optional): Number of results (default: 20, max: 100)
 - `offset` (optional): Pagination offset (default: 0)
 
 **Example Request:**
+
 ```
 GET /api/posts/search?q=javascript&limit=20&offset=0
 ```
 
 **Search Logic:**
+
 - Search in both `title` and `content` fields
 - Case-insensitive
 - Match partial words (e.g., "java" matches "javascript")
@@ -668,6 +714,7 @@ GET /api/posts/search?q=javascript&limit=20&offset=0
 - Then order by vote_count DESC
 
 **Success Response (200):**
+
 ```json
 {
   "posts": [
@@ -704,11 +751,13 @@ GET /api/posts/search?q=javascript&limit=20&offset=0
 **Purpose:** Report a post for moderation
 
 **Headers Required:**
+
 ```
 Authorization: Bearer <token>
 ```
 
 **Request Body:**
+
 ```json
 {
   "reason": "spam",
@@ -717,6 +766,7 @@ Authorization: Bearer <token>
 ```
 
 **Reason Values (Enum):**
+
 - `"spam"` - Spam or advertising
 - `"harassment"` - Harassment or bullying
 - `"inappropriate"` - Inappropriate content
@@ -724,10 +774,12 @@ Authorization: Bearer <token>
 - `"other"` - Other reason (details required)
 
 **Validation:**
+
 - `reason`: Required, must be one of the enum values
 - `details`: Optional, max 500 characters (required if reason is "other")
 
 **Success Response (201):**
+
 ```json
 {
   "message": "Report submitted successfully",
@@ -736,6 +788,7 @@ Authorization: Bearer <token>
 ```
 
 **Error Response (400):**
+
 ```json
 {
   "error": "You have already reported this post",
@@ -744,6 +797,7 @@ Authorization: Bearer <token>
 ```
 
 **Business Logic:**
+
 - Users can only report each post once
 - Store report in database with status "pending"
 - Reports are for admin review (admin panel is post-MVP)
@@ -755,10 +809,12 @@ Authorization: Bearer <token>
 #### Authentication
 
 **JWT Tokens (Recommended):**
+
 - Algorithm: HS256 or RS256
 - Expiry: 7 days
 - Include in header: `Authorization: Bearer <token>`
 - Token payload should include:
+
 ```json
   {
     "user_id": "uuid",
@@ -769,6 +825,7 @@ Authorization: Bearer <token>
 ```
 
 **Session-Based Auth (Alternative):**
+
 - Use secure HTTP-only cookies
 - Session expiry: 7 days
 - Store sessions in Redis or database
@@ -782,15 +839,18 @@ Authorization: Bearer <token>
 #### Input Validation & Sanitization
 
 **SQL Injection Prevention:**
+
 - Use parameterized queries or ORM
 - Never concatenate user input into SQL
 
 **XSS Prevention:**
+
 - Sanitize HTML tags from user input
 - Escape special characters
 - Strip `<script>` tags
 
 **Validation:**
+
 - Validate all string lengths
 - Validate email format
 - Validate UUID format
@@ -811,6 +871,7 @@ Implement rate limiting on these endpoints:
 #### CORS Configuration
 
 Allow requests from:
+
 - `http://localhost:3000` (development)
 - Your production frontend domain (when deployed)
 
@@ -819,6 +880,7 @@ Allow requests from:
 ### 8. Error Handling
 
 **Standard Error Response Format:**
+
 ```json
 {
   "error": "Human-readable error message",
@@ -841,6 +903,7 @@ Allow requests from:
 | 500 | Internal Server Error | Server-side errors |
 
 **Common Error Codes:**
+
 ```javascript
 // Authentication
 UNAUTHORIZED = "User not authenticated"
@@ -878,6 +941,7 @@ RATE_LIMIT_EXCEEDED = "Too many requests, please try again later"
 > **Backend Developer:** Here are all the tables you need to create
 
 ### Tables Overview
+
 ```
 users
 ├── id (PK)
@@ -923,6 +987,7 @@ reports
 ### Detailed Schema
 
 #### `users` Table
+
 ```sql
 CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -930,7 +995,7 @@ CREATE TABLE users (
   email VARCHAR(255) UNIQUE NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  
+
   -- Constraints
   CONSTRAINT username_length CHECK (LENGTH(username) >= 3 AND LENGTH(username) <= 20),
   CONSTRAINT username_format CHECK (username ~ '^[a-zA-Z0-9_]+$'),
@@ -944,6 +1009,7 @@ CREATE INDEX idx_users_created_at ON users(created_at);
 ```
 
 **Field Descriptions:**
+
 - `id`: Unique identifier (UUID)
 - `username`: Case-insensitive unique username
 - `email`: Case-insensitive unique email
@@ -953,6 +1019,7 @@ CREATE INDEX idx_users_created_at ON users(created_at);
 ---
 
 #### `topics` Table
+
 ```sql
 CREATE TABLE topics (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -966,6 +1033,7 @@ CREATE INDEX idx_topics_name ON topics(name);
 ```
 
 **Seed Data (run on first setup):**
+
 ```sql
 INSERT INTO topics (name, description) VALUES
   ('General', 'General discussions about anything'),
@@ -983,6 +1051,7 @@ INSERT INTO topics (name, description) VALUES
 ---
 
 #### `posts` Table
+
 ```sql
 CREATE TABLE posts (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -993,7 +1062,7 @@ CREATE TABLE posts (
   vote_count INTEGER DEFAULT 0,
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  
+
   -- Constraints
   CONSTRAINT title_length CHECK (LENGTH(title) >= 5 AND LENGTH(title) <= 300),
   CONSTRAINT content_length CHECK (LENGTH(content) >= 10 AND LENGTH(content) <= 10000)
@@ -1011,6 +1080,7 @@ CREATE INDEX idx_posts_search ON posts USING gin(to_tsvector('english', title ||
 ```
 
 **Field Descriptions:**
+
 - `id`: Unique post identifier
 - `user_id`: Author of the post
 - `topic_id`: Topic/thread the post belongs to
@@ -1021,6 +1091,7 @@ CREATE INDEX idx_posts_search ON posts USING gin(to_tsvector('english', title ||
 - `updated_at`: When post was last edited
 
 **Trigger for updated_at:**
+
 ```sql
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -1037,6 +1108,7 @@ FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 ---
 
 #### `votes` Table
+
 ```sql
 CREATE TABLE votes (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -1044,7 +1116,7 @@ CREATE TABLE votes (
   post_id UUID NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
   vote_type INTEGER NOT NULL CHECK (vote_type IN (-1, 1)),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  
+
   -- User can only vote once per post
   CONSTRAINT unique_user_post_vote UNIQUE (user_id, post_id)
 );
@@ -1055,10 +1127,12 @@ CREATE INDEX idx_votes_user_id ON votes(user_id);
 ```
 
 **Field Descriptions:**
+
 - `vote_type`: `1` for upvote, `-1` for downvote
 - Constraint ensures one vote per user per post
 
 **Trigger to update post.vote_count automatically:**
+
 ```sql
 -- Function to update vote count
 CREATE OR REPLACE FUNCTION update_post_vote_count()
@@ -1089,6 +1163,7 @@ FOR EACH ROW EXECUTE FUNCTION update_post_vote_count();
 ---
 
 #### `reports` Table
+
 ```sql
 CREATE TABLE reports (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -1098,7 +1173,7 @@ CREATE TABLE reports (
   details TEXT CHECK (LENGTH(details) <= 500),
   status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'reviewed', 'dismissed')),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  
+
   -- User can only report each post once
   CONSTRAINT unique_user_post_report UNIQUE (reporter_id, post_id)
 );
@@ -1110,6 +1185,7 @@ CREATE INDEX idx_reports_created_at ON reports(created_at DESC);
 ```
 
 **Field Descriptions:**
+
 - `reporter_id`: User who submitted the report (nullable if user deleted)
 - `post_id`: Post being reported
 - `reason`: Reason category (enum)
@@ -1119,6 +1195,7 @@ CREATE INDEX idx_reports_created_at ON reports(created_at DESC);
 ---
 
 ### Database Relationships
+
 ```
 users (1) ──< (many) posts
 users (1) ──< (many) votes
@@ -1131,6 +1208,7 @@ posts (1) ──< (many) reports
 ```
 
 **Cascade Rules:**
+
 - Delete user → Delete their posts, votes, and reports
 - Delete post → Delete associated votes and reports
 - Delete topic → Set posts.topic_id to NULL (or reassign to "General")
@@ -1153,6 +1231,7 @@ posts (1) ──< (many) reports
 ---
 
 ### Project Structure (Suggested)
+
 ```suggested
 frontend/
 ├── public/
@@ -1208,12 +1287,14 @@ frontend/
 **Purpose:** Main feed showing all posts
 
 **What to display:**
+
 - Navbar (with login/register or user menu)
 - Sort dropdown (Hot/New/Top)
 - Post feed (list of PostCard components)
 - Infinite scroll or "Load More" button
 
 **API Calls:**
+
 ```javascript
 // On page load
 GET /api/posts?sort=hot&limit=20&offset=0
@@ -1226,6 +1307,7 @@ GET /api/posts?sort=hot&limit=20&offset=20
 ```
 
 **State to manage:**
+
 - `posts` - Array of post objects
 - `sort` - Current sort option ('hot', 'new', 'top')
 - `loading` - Loading state
@@ -1240,22 +1322,26 @@ GET /api/posts?sort=hot&limit=20&offset=20
 **Purpose:** User login form
 
 **Form fields:**
+
 - Username (text input)
 - Password (password input)
 - Submit button
 
 **API Call:**
+
 ```javascript
 POST /api/auth/login
 Body: { username, password }
 ```
 
 **On success:**
+
 1. Store token in localStorage or cookie
 2. Update global auth context
 3. Redirect to home page
 
 **On error:**
+
 - Display error message below form
 - Clear password field
 
@@ -1268,6 +1354,7 @@ Body: { username, password }
 **Purpose:** User registration form
 
 **Form fields:**
+
 - Username (text input, 3-20 chars)
 - Email (email input)
 - Password (password input, min 8 chars)
@@ -1275,18 +1362,21 @@ Body: { username, password }
 - Submit button
 
 **Validation (client-side):**
+
 - Username: 3-20 chars, alphanumeric + underscore
 - Email: Valid format
 - Password: Minimum 8 characters
 - Passwords match
 
 **API Call:**
+
 ```javascript
 POST /api/auth/register
 Body: { username, email, password }
 ```
 
 **On success:**
+
 1. Store token
 2. Update auth context
 3. Redirect to home
@@ -1302,12 +1392,14 @@ Body: { username, email, password }
 **Auth required:** Yes (redirect to login if not authenticated)
 
 **Form fields:**
+
 - Title (text input, 5-300 chars)
 - Content (textarea, 10-10,000 chars)
 - Topic (dropdown select)
 - Submit button
 
 **API Calls:**
+
 ```javascript
 // Load topics on mount
 GET /api/topics
@@ -1318,6 +1410,7 @@ Body: { title, content, topic_id }
 ```
 
 **On success:**
+
 - Redirect to the new post page (`/post/[id]`)
 
 ---
@@ -1329,12 +1422,14 @@ Body: { title, content, topic_id }
 **Purpose:** View a single post in detail
 
 **What to display:**
+
 - Full post card with all details
 - Vote buttons
 - Options menu (if owner)
 - Comments section (placeholder for now - Phase 2)
 
 **API Call:**
+
 ```javascript
 GET /api/posts/:id
 ```
@@ -1350,11 +1445,13 @@ GET /api/posts/:id
 **Purpose:** Search results page
 
 **What to display:**
+
 - Search bar (pre-filled with query)
 - Results count
 - List of matching posts (PostCard components)
 
 **API Call:**
+
 ```javascript
 GET /api/posts/search?q=keyword&limit=20&offset=0
 ```
@@ -1380,6 +1477,7 @@ GET /api/posts/search?q=keyword&limit=20&offset=0
 └─ Profile
 └─ Logout
 **Features:**
+
 - Logo/title links to home
 - Search bar (navigates to `/search?q=...`)
 - Login/Register buttons (if not authenticated)
@@ -1395,6 +1493,7 @@ GET /api/posts/search?q=keyword&limit=20&offset=0
 **Purpose:** Display individual post in card format
 
 **Props:**
+
 ```javascript
 {
   id: "uuid",
@@ -1421,6 +1520,7 @@ GET /api/posts/search?q=keyword&limit=20&offset=0
 │  ▲ 42 ▼                                         │ ← Vote buttons & count
 └─────────────────────────────────────────────────┘
 **Features:**
+
 - Click anywhere on card → Navigate to `/post/[id]`
 - Vote buttons:
   - Upvote arrow (highlighted if user_vote === 1)
@@ -1435,6 +1535,7 @@ GET /api/posts/search?q=keyword&limit=20&offset=0
 - Content preview: Show first 200 characters + "..."
 
 **States:**
+
 - Default
 - Hovered (slight shadow/lift)
 - Upvoted (upvote arrow orange/colored)
@@ -1449,6 +1550,7 @@ GET /api/posts/search?q=keyword&limit=20&offset=0
 **Purpose:** Upvote/downvote interface
 
 **Props:**
+
 ```javascript
 {
   post_id: "uuid",
@@ -1463,6 +1565,7 @@ GET /api/posts/search?q=keyword&limit=20&offset=0
 42 (vote count)
 ▼  (downvote arrow)
 **Behavior:**
+
 - If not authenticated: Show tooltip "Login to vote"
 - On upvote click:
   - If user_vote === 1: Remove vote (toggle off) → API call with vote: 0
@@ -1472,12 +1575,14 @@ GET /api/posts/search?q=keyword&limit=20&offset=0
   - Else: Downvote → API call with vote: -1
 
 **API Call:**
+
 ```javascript
 POST /api/posts/:id/vote
 Body: { vote: 1 | -1 | 0 }
 ```
 
 **On success:**
+
 - Update local state immediately (optimistic update)
 - Call `onVoteChange` callback to update parent
 
@@ -1490,11 +1595,13 @@ Body: { vote: 1 | -1 | 0 }
 **Purpose:** Let users sort feed
 
 **Options:**
+
 - Hot (default)
 - New
 - Top
 
 **Props:**
+
 ```javascript
 {
   currentSort: "hot" | "new" | "top",
@@ -1508,6 +1615,7 @@ Sort by: [Hot ▼]
 └─ New
 └─ Top
 **Behavior:**
+
 - On selection change, call `onSortChange(newSort)`
 - Parent component refetches posts with new sort
 
@@ -1520,12 +1628,14 @@ Sort by: [Hot ▼]
 **Purpose:** Search input with debouncing
 
 **Features:**
+
 - Text input
 - Search icon
 - Debouncing (300ms delay before triggering search)
 - Clear button (X) when text is entered
 
 **Behavior:**
+
 ```javascript
 // Pseudo-code
 const [query, setQuery] = useState('');
@@ -1537,7 +1647,7 @@ useEffect(() => {
       router.push(`/search?q=${query}`);
     }
   }, 300);
-  
+
   return () => clearTimeout(timer);
 }, [query]);
 ```
@@ -1551,6 +1661,7 @@ useEffect(() => {
 **Purpose:** Display list of posts with infinite scroll
 
 **Props:**
+
 ```javascript
 {
   posts: Array<Post>,
@@ -1561,6 +1672,7 @@ useEffect(() => {
 ```
 
 **Features:**
+
 - Map through `posts` and render `PostCard` for each
 - Show loading spinner at bottom if `loading === true`
 - Infinite scroll or "Load More" button
@@ -1575,6 +1687,7 @@ useEffect(() => {
 **Purpose:** Three-dot menu on post cards
 
 **Props:**
+
 ```javascript
 {
   post_id: "uuid",
@@ -1585,11 +1698,13 @@ useEffect(() => {
 ```
 
 **Menu items:**
+
 - Report (always visible)
 - Edit (only if `is_owner === true`)
 - Delete (only if `is_owner === true`)
 
 **Behavior:**
+
 - Click three-dot icon → Show dropdown menu
 - Report: Open modal/dialog with report form
 - Edit: Navigate to edit page or inline editing
@@ -1600,6 +1715,7 @@ useEffect(() => {
 ### State Management
 
 **Global State (Auth Context):**
+
 ```javascript
 // src/context/AuthContext.jsx
 const AuthContext = createContext();
@@ -1645,6 +1761,7 @@ export const useAuth = () => useContext(AuthContext);
 ```
 
 **Usage in components:**
+
 ```javascript
 const { user, login, logout } = useAuth();
 
@@ -1659,6 +1776,7 @@ if (user) {
 ### API Helper Functions
 
 **File:** `src/lib/api.js`
+
 ```javascript
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -1672,12 +1790,12 @@ function getHeaders() {
   const headers = {
     'Content-Type': 'application/json',
   };
-  
+
   const token = getToken();
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
   }
-  
+
   return headers;
 }
 
@@ -1687,12 +1805,12 @@ export async function apiGet(endpoint) {
     method: 'GET',
     headers: getHeaders(),
   });
-  
+
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.error || 'Request failed');
   }
-  
+
   return response.json();
 }
 
@@ -1703,12 +1821,12 @@ export async function apiPost(endpoint, data) {
     headers: getHeaders(),
     body: JSON.stringify(data),
   });
-  
+
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.error || 'Request failed');
   }
-  
+
   return response.json();
 }
 
@@ -1719,12 +1837,12 @@ export async function apiPut(endpoint, data) {
     headers: getHeaders(),
     body: JSON.stringify(data),
   });
-  
+
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.error || 'Request failed');
   }
-  
+
   return response.json();
 }
 
@@ -1734,17 +1852,18 @@ export async function apiDelete(endpoint) {
     method: 'DELETE',
     headers: getHeaders(),
   });
-  
+
   if (!response.ok) {
     const error = await response.json();
     throw new Error(error.error || 'Request failed');
   }
-  
+
   return response.json();
 }
 ```
 
 **Usage:**
+
 ```javascript
 import { apiGet, apiPost } from '@/lib/api';
 
@@ -1764,6 +1883,7 @@ const newPost = await apiPost('/api/posts', {
 ### Design Guidelines
 
 #### Color Scheme (Suggested)
+
 ```css
 /* Light Mode */
 --background: #ffffff
@@ -1784,6 +1904,7 @@ const newPost = await apiPost('/api/posts', {
 ```
 
 #### Typography
+
 ```css
 /* Headings */
 font-family: 'Inter', 'Helvetica Neue', sans-serif
@@ -1803,6 +1924,7 @@ small: 14px, regular
 ```
 
 #### Spacing
+
 ```css
 --spacing-xs: 4px
 --spacing-sm: 8px
@@ -1812,6 +1934,7 @@ small: 14px, regular
 ```
 
 #### Card Design
+
 ```css
 .post-card {
   background: var(--card-bg);
@@ -1832,6 +1955,7 @@ small: 14px, regular
 ### Responsive Design
 
 **Breakpoints:**
+
 ```css
 /* Mobile */
 @media (max-width: 640px) {
@@ -1852,6 +1976,7 @@ small: 14px, regular
 ```
 
 **Mobile-first approach:**
+
 - Design for mobile first
 - Enhance for larger screens
 - Touch-friendly buttons (min 44x44px)
@@ -1865,9 +1990,9 @@ small: 14px, regular
 ### Base URL
 
 **Development:**
-http://localhost:8000/api
+<http://localhost:8000/api>
 **Production:**
-https://your-domain.com/api
+<https://your-domain.com/api>
 ---
 
 ### Authentication Endpoints
@@ -1917,6 +2042,7 @@ See detailed examples in the Backend Requirements section above.
 #### Phase 1: Foundation (Week 1)
 
 **Backend:**
+
 - [ ] Set up project structure
 - [ ] Configure database
 - [ ] Create database schema and migrations
@@ -1924,6 +2050,7 @@ See detailed examples in the Backend Requirements section above.
 - [ ] Test auth with Postman/Insomnia
 
 **Frontend:**
+
 - [ ] Set up Next.js project
 - [ ] Configure Tailwind CSS
 - [ ] Create AuthContext
@@ -1938,6 +2065,7 @@ See detailed examples in the Backend Requirements section above.
 #### Phase 2: Posts CRUD (Week 2)
 
 **Backend:**
+
 - [ ] Implement `GET /posts` endpoint with sorting
 - [ ] Implement `POST /posts` endpoint
 - [ ] Implement `GET /posts/:id` endpoint
@@ -1946,6 +2074,7 @@ See detailed examples in the Backend Requirements section above.
 - [ ] Seed topics in database
 
 **Frontend:**
+
 - [ ] Build PostCard component
 - [ ] Build PostFeed component
 - [ ] Build Home page with feed
@@ -1960,11 +2089,13 @@ See detailed examples in the Backend Requirements section above.
 #### Phase 3: Voting & Sorting (Week 3)
 
 **Backend:**
+
 - [ ] Implement `POST /posts/:id/vote` endpoint
 - [ ] Add vote triggers to update post.vote_count
 - [ ] Optimize sorting queries (Hot/New/Top)
 
 **Frontend:**
+
 - [ ] Build VoteButtons component
 - [ ] Integrate voting into PostCard
 - [ ] Build SortDropdown component
@@ -1978,11 +2109,13 @@ See detailed examples in the Backend Requirements section above.
 #### Phase 4: Search & Reports (Week 4)
 
 **Backend:**
+
 - [ ] Implement `GET /posts/search` endpoint
 - [ ] Optimize search with full-text indexes
 - [ ] Implement `POST /posts/:id/report` endpoint
 
 **Frontend:**
+
 - [ ] Build SearchBar component
 - [ ] Build Search page
 - [ ] Add debouncing to search
@@ -1996,6 +2129,7 @@ See detailed examples in the Backend Requirements section above.
 #### Phase 5: Polish & Testing (Week 5)
 
 **Backend:**
+
 - [ ] Add rate limiting
 - [ ] Add input validation
 - [ ] Add error handling
@@ -2003,6 +2137,7 @@ See detailed examples in the Backend Requirements section above.
 - [ ] Test all endpoints
 
 **Frontend:**
+
 - [ ] Add loading states
 - [ ] Add error messages
 - [ ] Improve responsive design
@@ -2025,25 +2160,28 @@ main (production-ready code)
 **Workflow:**
 
 1. Create feature branch from `develop`:
+
 ```bash
    git checkout develop
    git checkout -b feature/auth
 ```
 
-2. Work on feature and commit:
+1. Work on feature and commit:
+
 ```bash
    git add .
    git commit -m "feat: implement user registration"
 ```
 
-3. Push and create Pull Request:
+1. Push and create Pull Request:
+
 ```bash
    git push origin feature/auth
 ```
 
-4. Review and merge to `develop`
+1. Review and merge to `develop`
 
-5. When ready, merge `develop` to `main`
+2. When ready, merge `develop` to `main`
 
 **Commit Message Convention:**
 feat: Add new feature
@@ -2058,11 +2196,13 @@ chore: Update dependencies
 ### Communication
 
 **Daily Standups (async):**
+
 - What did you work on yesterday?
 - What will you work on today?
 - Any blockers?
 
 **Tools:**
+
 - **Slack/Discord:** Daily communication
 - **GitHub:** Code reviews, issues
 - **Notion/Google Docs:** Documentation
@@ -2075,6 +2215,7 @@ chore: Update dependencies
 ### Backend Tests
 
 #### Authentication
+
 - [ ] User can register with valid credentials
 - [ ] Registration fails with duplicate username
 - [ ] Registration fails with duplicate email
@@ -2087,6 +2228,7 @@ chore: Update dependencies
 - [ ] Protected routes require authentication
 
 #### Posts
+
 - [ ] Authenticated user can create post
 - [ ] Unauthenticated user cannot create post
 - [ ] Post requires valid topic_id
@@ -2098,6 +2240,7 @@ chore: Update dependencies
 - [ ] Posts return correct topic info
 
 #### Voting
+
 - [ ] User can upvote post
 - [ ] User can downvote post
 - [ ] User can remove vote (toggle)
@@ -2107,12 +2250,14 @@ chore: Update dependencies
 - [ ] Unauthenticated users cannot vote
 
 #### Sorting
+
 - [ ] Hot sort works correctly
 - [ ] New sort returns newest posts first
 - [ ] Top sort returns highest voted posts first
 - [ ] Pagination works (limit & offset)
 
 #### Search
+
 - [ ] Search finds posts by title
 - [ ] Search finds posts by content
 - [ ] Search is case-insensitive
@@ -2120,6 +2265,7 @@ chore: Update dependencies
 - [ ] Search pagination works
 
 #### Reports
+
 - [ ] User can report post
 - [ ] User cannot report same post twice
 - [ ] Report requires valid reason
@@ -2130,6 +2276,7 @@ chore: Update dependencies
 ### Frontend Tests
 
 #### Authentication
+
 - [ ] Registration form validates input
 - [ ] Registration shows error for duplicate username
 - [ ] Registration redirects to home on success
@@ -2140,6 +2287,7 @@ chore: Update dependencies
 - [ ] Protected routes redirect to login
 
 #### Posts
+
 - [ ] Home feed loads posts
 - [ ] Post cards display all information correctly
 - [ ] Clicking post card navigates to post page
@@ -2151,6 +2299,7 @@ chore: Update dependencies
 - [ ] Delete shows confirmation dialog
 
 #### Voting
+
 - [ ] Upvote button works
 - [ ] Downvote button works
 - [ ] Vote count updates in real-time
@@ -2159,12 +2308,14 @@ chore: Update dependencies
 - [ ] Downvoted posts show highlighted downvote button
 
 #### Sorting
+
 - [ ] Sort dropdown changes feed
 - [ ] Hot sort is default
 - [ ] Changing sort refetches posts
 - [ ] Sort persists on page navigation
 
 #### Search
+
 - [ ] Search bar has debouncing
 - [ ] Search navigates to search page
 - [ ] Search results display correctly
@@ -2172,6 +2323,7 @@ chore: Update dependencies
 - [ ] Clear button clears search input
 
 #### UI/UX
+
 - [ ] Loading spinners show during API calls
 - [ ] Error messages display clearly
 - [ ] Forms show validation errors
@@ -2190,12 +2342,14 @@ chore: Update dependencies
 ### Phase 2: Comments System
 
 **Backend:**
+
 - New `comments` table
 - Nested comments (parent_id reference)
 - Comment voting
 - Comment CRUD endpoints
 
 **Frontend:**
+
 - Comments section on post page
 - Nested comment threads (reddit-style)
 - Comment forms
@@ -2206,12 +2360,14 @@ chore: Update dependencies
 ### Phase 3: User Profiles
 
 **Backend:**
+
 - Update users table (add bio, avatar_url fields)
 - User profile endpoint
 - User post history endpoint
 - Upload avatar (image storage)
 
 **Frontend:**
+
 - Profile page showing user info
 - User's post history
 - Edit profile form
@@ -2222,11 +2378,13 @@ chore: Update dependencies
 ### Phase 4: AI Features
 
 **Backend:**
+
 - Integrate AI API for topic detection
 - Auto-categorize posts based on content
 - Content moderation (detect spam, inappropriate content)
 
 **Frontend:**
+
 - Show AI-suggested topics when creating post
 - Auto-fill topic based on content
 
@@ -2235,11 +2393,13 @@ chore: Update dependencies
 ### Phase 5: Recommendation Algorithm
 
 **Backend:**
+
 - Track user behavior (views, votes, time spent)
 - Build recommendation model
 - Personalized feed endpoint
 
 **Frontend:**
+
 - "For You" feed (personalized)
 - "Popular" feed (trending across platform)
 - Feed toggle between algorithmic and chronological
@@ -2249,12 +2409,14 @@ chore: Update dependencies
 ### Phase 6: Rich Media
 
 **Backend:**
+
 - Image upload (AWS S3, Cloudinary)
 - Video upload
 - Image/video processing
 - CDN integration
 
 **Frontend:**
+
 - Image upload in post form
 - Image display in posts
 - Video player
@@ -2265,11 +2427,13 @@ chore: Update dependencies
 ### Phase 7: Notifications
 
 **Backend:**
+
 - Notifications table
 - Notification triggers (new comment, vote, mention)
 - WebSocket or polling for real-time updates
 
 **Frontend:**
+
 - Notification bell icon
 - Notification dropdown
 - Mark as read functionality
@@ -2280,6 +2444,7 @@ chore: Update dependencies
 ### Phase 8: Advanced Moderation
 
 **Backend:**
+
 - Moderator roles
 - Ban/mute users
 - Approve/remove posts
@@ -2287,6 +2452,7 @@ chore: Update dependencies
 - Moderation logs
 
 **Frontend:**
+
 - Moderator dashboard
 - Moderation tools on posts
 - User management interface
