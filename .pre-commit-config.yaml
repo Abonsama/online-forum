@@ -12,7 +12,6 @@ repos:
       - id: check-merge-conflict
       - id: name-tests-test
         exclude: ^tests/(conftest|schemas|utils)\.py$
-    files: ^backend/
 
   - repo: https://github.com/PyCQA/autoflake
     rev: v2.3.1
@@ -24,20 +23,29 @@ repos:
           - --remove-unused-variables
           - --recursive
           - --ignore-init-module-imports
-    files: ^backend/
 
   - repo: https://github.com/pycqa/isort
     rev: 7.0.0
     hooks:
       - id: isort
+        files: ^backend/
         args: [--profile=black, --line-length=100]
         exclude: (__init__.py$|migrations/)
-    files: ^backend/
 
   - repo: https://github.com/psf/black
     rev: 25.9.0
     hooks:
       - id: black
+        files: ^backend/
         args: [--line-length=100]
         exclude: (__init__.py$|migrations/)
-    files: ^backend/
+
+
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v9.39.1
+    hooks:
+      - id: eslint
+        files: ^frontend/
+        additional_dependencies:
+          - eslint
+          - eslint-config-react-app
