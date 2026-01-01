@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import Field
 
 from app.core.constants import FieldSizes
@@ -37,3 +38,15 @@ class TopicResponse(BaseTimestampSchema):
     slug: str
     description: str | None
     is_active: bool
+
+
+class TopicDetailedResponse(BaseSchema):
+    """Detailed Topic schema with post count for API response"""
+
+    id: int
+    name: str
+    slug: str
+    description: str | None
+    is_active: bool
+    created_at: datetime | None
+    post_count: int

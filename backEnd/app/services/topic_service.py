@@ -1,3 +1,4 @@
+from datetime import datetime
 from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -5,6 +6,18 @@ from app.models.junctions.post_topic import PostTopic
 from app.models.topic import Topic
 from app.repos.topic import TopicRepo
 from app.services.base_service import BaseService
+
+from typing import AsyncGenerator, TypedDict
+
+
+class TopicsWithCount(TypedDict):
+    id: int
+    name: str
+    slug: str
+    description: str | None
+    is_active: bool
+    created_at: datetime | None
+    post_count: int
 
 
 class TopicService(BaseService):
@@ -19,7 +32,9 @@ class TopicService(BaseService):
         super().__init__(db)
         self.topic_repo = TopicRepo(db)
 
-    async def get_all_with_counts(self, only_active: bool = True) -> list[dict]:
+    async def get_all_with_counts(
+        self, only_active: bool = True
+    ) -> AsyncGenerator[TopicsWithCount, None]:
         """
         Get all topics with post counts.
 
@@ -48,21 +63,17 @@ class TopicService(BaseService):
         result = await self.db.execute(query)
         rows = result.all()
 
-        # Convert to list of dicts
-        topics_with_counts = []
         for topic, post_count in rows:
-            topic_dict = {
+            topic_dict: TopicsWithCount = {
                 "id": topic.id,
                 "name": topic.name,
                 "slug": topic.slug,
                 "description": topic.description,
                 "is_active": topic.is_active,
-                "created_at": topic.created_at.isoformat() if topic.created_at else None,
+                "created_at": topic.created_at if topic.created_at else None,
                 "post_count": post_count,
             }
-            topics_with_counts.append(topic_dict)
-
-        return topics_with_counts
+            yield topic_dict
 
     async def get_by_id(self, topic_id: int) -> Topic:
         """

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 
 from app.api.v1.deps.auth import get_current_user
-from app.api.v1.endpoints import auth, user
+from app.api.v1.endpoints import auth, post, topic, user
 
 api_v1_router = APIRouter(prefix="/api/v1")
 
@@ -17,4 +17,16 @@ api_v1_router.include_router(
     prefix="/users",
     tags=["Users"],
     dependencies=[Depends(get_current_user)],
+)
+
+api_v1_router.include_router(
+    topic.router,
+    prefix="/topics",
+    tags=["Topics"],
+)
+
+api_v1_router.include_router(
+    post.router,
+    prefix="/posts",
+    tags=["Posts"],
 )

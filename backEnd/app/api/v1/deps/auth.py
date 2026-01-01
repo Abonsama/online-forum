@@ -25,6 +25,9 @@ from app.schemas import TokenData, TokenPayload, UserCreate, UserSignup
 # OAuth2 password bearer scheme for token authentication
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"/api/v1/auth/login")
 
+# OAuth2 password bearer scheme with auto_error=False for optional auth
+oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl=f"/api/v1/auth/login", auto_error=False)
+
 
 async def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)],
@@ -96,6 +99,56 @@ async def get_current_user(
 
     return user
 
+async def get_current_user_optional(
+    db: Annotated[AsyncSession, Depends(get_session)],
+    token: str | None = Depends(oauth2_scheme_optional),
+) -> User | None:
+    """
+    Get current authenticated user from JWT token (optional)
+
+    Returns None if no token provided or token is invalid.
+    Does not raise exceptions - useful for endpoints where auth is optional.
+
+    Args:
+        token: JWT token (optional)
+        db: Database session
+
+    Returns:
+        Current authenticated user or None
+    """
+    if not token:
+        return None
+
+    try:
+        payload = jwt.decode(
+            token=token,
+            key=settings.secret_key,
+            algorithms=settings.jwt_algorithm,
+        )
+
+        user_id: str | int | uuid.UUID | None = payload.get("sub")
+        expires_at: int | None = payload.get("exp")
+
+        if user_id is None or expires_at is None:
+            return None
+
+        token_data = TokenData(
+            user_id=parse_user_id(user_id),
+            issued_at=payload.get("iat"),
+            expires_at=expires_at,
+        )
+
+        now = int(datetime.now(UTC).timestamp())
+
+        if token_data.expires_at is not None and now > token_data.expires_at:
+            return None
+
+        user = await repos.UserRepo(db).get_by_id(token_data.user_id)
+        return user
+
+    except (JWTClaimsError, ExpiredSignatureError, JWTError):
+        return None
+
 
 async def generate_access_token(
     user_in: Annotated[UserSignup, Form()],
@@ -123,11 +176,9 @@ async def generate_access_token(
     user_hashed_password = get_password_hash(user_in.password.get_secret_value())
     user = await repos.UserRepo(db).create_one(
         schema=UserCreate(
-            first_name="",
-            last_name="",
             username=user_in.username,
             email=user_in.email,
-            hashed_password=user_hashed_password,
+            password_hash=user_hashed_password,
         ),
     )
     access_token = create_access_token(subject=str(user.id))
@@ -211,7 +262,7 @@ async def login_user_for_access_token(
     """
     user = await repos.UserRepo(db).get_by_username(username=user_data.username)
 
-    if not user or not verify_password(user_data.password, user.hashed_password):
+    if not user or not verify_password(user_data.password, user.password_hash):
         raise http_exceptions.UnauthorizedException(
             "Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},

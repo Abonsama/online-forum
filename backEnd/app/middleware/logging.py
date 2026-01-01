@@ -46,10 +46,13 @@ class LoggingMiddleware(BaseHTTPMiddleware):
         except Exception as e:
             process_time = time.time() - start_time
 
-            try:
-                json_body = await request.json()
-            except Exception:
-                json_body = ""
+            json_body = ""
+            # Only try to parse JSON body for requests that typically have one
+            if request.method in ["POST", "PUT", "PATCH"]:
+                try:
+                    json_body = await request.json()
+                except Exception:
+                    json_body = ""
 
             logger.error(
                 f"[{request_id}] {request.method} {request.url.path} - "

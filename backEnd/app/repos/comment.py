@@ -178,7 +178,7 @@ class CommentRepo(BaseRepository[Comment, CommentCreate, CommentUpdate]):
             bool: True if successful, False otherwise.
         """
         stmt = text(
-            "UPDATE comment SET vote_count = :vote_count WHERE id = :comment_id"
+            "UPDATE online_forum.comment SET vote_count = :vote_count WHERE id = :comment_id"
         )
         result = await self.session.execute(
             stmt, {"comment_id": comment_id, "vote_count": new_vote_count}
@@ -196,9 +196,7 @@ class CommentRepo(BaseRepository[Comment, CommentCreate, CommentUpdate]):
         Returns:
             bool: True if successful, False otherwise.
         """
-        stmt = text(
-            "UPDATE comment SET is_deleted = true WHERE id = :comment_id"
-        )
+        stmt = text("UPDATE online_forum.comment SET is_deleted = true WHERE id = :comment_id")
         result = await self.session.execute(stmt, {"comment_id": comment_id})
         await self.session.commit()
         return result.rowcount > 0  # type: ignore

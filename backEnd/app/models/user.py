@@ -1,3 +1,4 @@
+from enum import StrEnum
 from typing import TYPE_CHECKING
 
 from sqlalchemy import Boolean, String
@@ -8,6 +9,14 @@ from app.models.base import Base
 
 if TYPE_CHECKING:
     from app.models import Comment, CommentVote, Post, PostVote, Report
+
+
+class UserRoleEnum(StrEnum):
+    """User roles enumeration"""
+
+    USER = "user"
+    MODERATOR = "moderator"
+    ADMIN = "admin"
 
 
 class User(Base):
@@ -28,7 +37,7 @@ class User(Base):
         String(FieldSizes.PASSWORD_HASH),
         nullable=False,
     )
-    role: Mapped[str] = mapped_column(
+    role: Mapped[UserRoleEnum] = mapped_column(
         String(FieldSizes.USER_ROLE),
         nullable=False,
         default="user",

@@ -3,6 +3,21 @@ from pydantic import Field, field_validator
 from app.schemas import BaseSchema, BaseTimestampSchema
 
 
+class VoteRequest(BaseSchema):
+    """Vote request schema for voting on posts"""
+
+    vote: int = Field(
+        description="Vote value: 1 for upvote, -1 for downvote, 0 to remove vote", ge=-1, le=1
+    )
+
+    @field_validator("vote")
+    def validate_vote(cls, value: int) -> int:
+        """Validate vote is -1, 0, or 1"""
+        if value not in [-1, 0, 1]:
+            raise ValueError("Vote must be -1 (downvote), 0 (remove), or 1 (upvote)")
+        return value
+
+
 class PostVoteCreate(BaseSchema):
     """PostVote creation schema"""
 

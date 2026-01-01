@@ -5,6 +5,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.constants import FieldSizes
 from app.models.base import Base
+from app.models.junctions.post_topic import PostTopic
 
 if TYPE_CHECKING:
     from app.models.post import Post
@@ -39,6 +40,6 @@ class Topic(Base):
     # Relationships
     posts: Mapped[list["Post"]] = relationship(
         "Post",
-        secondary="post_topic",
+        secondary=lambda: PostTopic.__table__,
         back_populates="topics",
     )

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import and_, select, text
+from sqlalchemy import and_, select, text, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -236,7 +236,8 @@ class ReportRepo(BaseRepository[Report, ReportCreate, ReportUpdate]):
         Returns:
             int: Number of pending reports.
         """
-        stmt = text("SELECT COUNT(*) FROM report WHERE status = 'pending'")
+        # stmt = text("SELECT COUNT(*) FROM online_forum.report WHERE status = 'pending'")
+        stmt = select(func.count(self.model.id)).where(self.model.status == 'pending')
         result = await self.session.execute(stmt)
         count = result.scalar()
         return count or 0

@@ -1,4 +1,4 @@
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.topic import Topic
@@ -60,3 +60,18 @@ class TopicRepo(BaseRepository[Topic, TopicCreate, TopicUpdate]):
         result = await self.session.execute(query)
 
         return result.scalar_one_or_none()
+
+    async def get_by_name_or_slug(self, name: str, slug: str) -> Topic | None:
+        """
+        Get a topic by name or slug
+
+        Args:
+            identifier (str): The name or slug of the topic.
+
+        Returns:
+            Topic | None: The topic object if found, else None.
+        """
+        query = select(self.model).where(or_(self.model.name == name, self.model.slug == slug))
+        result = await self.session.execute(query)
+
+        return result.scalars().first()

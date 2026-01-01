@@ -1,6 +1,6 @@
 from typing import Literal
 
-from sqlalchemy import func, or_, select, text
+from sqlalchemy import func, or_, select, text, update
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -160,7 +160,10 @@ class PostRepo(BaseRepository[Post, PostCreate, PostUpdate]):
         Returns:
             bool: True if successful, False otherwise.
         """
-        stmt = text("UPDATE post SET view_count = view_count + 1 WHERE id = :post_id")
+        # stmt = text("UPDATE online_forum.post SET view_count = view_count + 1 WHERE id = :post_id")
+        stmt = update(self.model).where(self.model.id == post_id).values(
+            view_count=self.model.view_count + 1
+        )
         result = await self.session.execute(stmt, {"post_id": post_id})
         await self.session.commit()
         return result.rowcount > 0  # type: ignore
@@ -176,8 +179,11 @@ class PostRepo(BaseRepository[Post, PostCreate, PostUpdate]):
         Returns:
             bool: True if successful, False otherwise.
         """
-        stmt = text(
-            "UPDATE post SET comment_count = comment_count + :increment WHERE id = :post_id"
+        # stmt = text(
+        #     "UPDATE online_forum.post SET comment_count = comment_count + :increment WHERE id = :post_id"
+        # )
+        stmt = update(self.model).where(self.model.id == post_id).values(
+            comment_count=self.model.comment_count + increment
         )
         result = await self.session.execute(stmt, {"post_id": post_id, "increment": increment})
         await self.session.commit()
@@ -194,7 +200,8 @@ class PostRepo(BaseRepository[Post, PostCreate, PostUpdate]):
         Returns:
             bool: True if successful, False otherwise.
         """
-        stmt = text("UPDATE post SET vote_count = :vote_count WHERE id = :post_id")
+        # stmt = text("UPDATE online_forum.post SET vote_count = :vote_count WHERE id = :post_id")
+        stmt = update(self.model).where(self.model.id == post_id).values(vote_count=new_vote_count)
         result = await self.session.execute(
             stmt, {"post_id": post_id, "vote_count": new_vote_count}
         )
@@ -211,7 +218,8 @@ class PostRepo(BaseRepository[Post, PostCreate, PostUpdate]):
         Returns:
             bool: True if successful, False otherwise.
         """
-        stmt = text("UPDATE post SET is_deleted = true WHERE id = :post_id")
+        # stmt = text("UPDATE online_forum.post SET is_deleted = true WHERE id = :post_id")
+        stmt = update(self.model).where(self.model.id == post_id).values(is_deleted=True)
         result = await self.session.execute(stmt, {"post_id": post_id})
         await self.session.commit()
         return result.rowcount > 0  # type: ignore

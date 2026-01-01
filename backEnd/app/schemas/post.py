@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import Field
 
 from app.core.constants import FieldSizes
@@ -33,8 +34,6 @@ class PostResponse(BaseTimestampSchema):
     is_deleted: bool
 
 
-
-
 class PostFeedResponse(BaseSchema):
     """Post feed response with user vote"""
 
@@ -45,5 +44,13 @@ class PostFeedResponse(BaseSchema):
     vote_count: int
     view_count: int
     comment_count: int
-    created_at: str
+    created_at: datetime
     user_vote: int | None = None  # 1 for upvote, -1 for downvote, None for no vote
+
+
+class PostDetailedResponse(BaseSchema):
+    """Detailed Post schema for API response"""
+
+    posts: list[PostFeedResponse]
+    total: int
+    has_more: bool
