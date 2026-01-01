@@ -1,3 +1,4 @@
+from enum import StrEnum
 import re
 from typing import Annotated
 
@@ -6,18 +7,22 @@ from pydantic import EmailStr, Field, SecretStr, field_validator
 from app.core.constants import FieldSizes
 from app.schemas import BaseSchema, BaseTimestampSchema
 
-USER_PASSWORD_REGEX = (
-    r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
-)
+USER_PASSWORD_REGEX = r"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$"
 USER_PASSWORD_DESCRIPTION = (
     "Password must be at least 8 characters long and include at least one uppercase letter, "
     + "one lowercase letter, one number, and one special character from @$!%*?&."
 )
-USER_USERNAME_REGEX = r"^(?=.*\d)[A-Za-z0-9_]{3,50}$"
+USER_USERNAME_REGEX = r"^[A-Za-z0-9_]{3,50}$"
 USER_USERNAME_DESCRIPTION = (
-    "Username must be 3 to 50 characters long, contain only letters, "
-    + "numbers, or underscores, and include at least one number."
+    "Username must be 3 to 50 characters long and contain only letters, "
+    + "numbers, or underscores."
 )
+
+
+class UserRole(StrEnum):
+    USER = "user"
+    MODERATOR = "moderator"
+    ADMIN = "admin"
 
 
 class UserBase(BaseSchema):
@@ -25,9 +30,6 @@ class UserBase(BaseSchema):
 
     username: str
     email: EmailStr
-    hashed_password: str
-    first_name: str
-    last_name: str
 
 
 class UserCreate(BaseSchema):
@@ -35,19 +37,18 @@ class UserCreate(BaseSchema):
 
     username: str
     email: EmailStr
-    hashed_password: str
-    first_name: str
-    last_name: str
+    password_hash: str
+    role: UserRole = UserRole.USER
 
 
 class UserUpdate(BaseSchema):
     """User update schema"""
 
-    first_name: str | None = None
-    last_name: str | None = None
     username: str | None = None
     email: EmailStr | None = None
     password: str | None = None
+    role: UserRole | None = None
+    is_active: bool | None = None
 
 
 class UserLogin(BaseSchema):
@@ -118,5 +119,6 @@ class UserResponse(BaseTimestampSchema):
     id: int
     username: str
     email: EmailStr
-    first_name: str
-    last_name: str
+    role: UserRole
+    is_active: bool
+    is_deleted: bool

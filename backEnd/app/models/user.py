@@ -1,10 +1,13 @@
-from typing import Optional
+from typing import TYPE_CHECKING
 
-from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy import Boolean, String
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.constants import FieldSizes
 from app.models.base import Base
+
+if TYPE_CHECKING:
+    from app.models import Comment, CommentVote, Post, PostVote, Report
 
 
 class User(Base):
@@ -21,15 +24,55 @@ class User(Base):
         index=True,
         nullable=False,
     )
-    hashed_password: Mapped[str] = mapped_column(
+    password_hash: Mapped[str] = mapped_column(
         String(FieldSizes.PASSWORD_HASH),
         nullable=False,
     )
-    first_name: Mapped[Optional[str]] = mapped_column(
-        String(FieldSizes.FIRST_NAME),
+    role: Mapped[str] = mapped_column(
+        String(FieldSizes.USER_ROLE),
         nullable=False,
+        default="user",
+        server_default="user",
     )
-    last_name: Mapped[Optional[str]] = mapped_column(
-        String(FieldSizes.LAST_NAME),
+    is_active: Mapped[bool] = mapped_column(
+        Boolean,
         nullable=False,
+        default=True,
+        server_default="true",
+    )
+    is_deleted: Mapped[bool] = mapped_column(
+        Boolean,
+        nullable=False,
+        default=False,
+        server_default="false",
+    )
+
+    # Relationships
+    posts: Mapped[list["Post"]] = relationship(
+        "Post",
+        back_populates="user",
+        foreign_keys="Post.user_id",
+    )
+    comments: Mapped[list["Comment"]] = relationship(
+        "Comment",
+        back_populates="user",
+        foreign_keys="Comment.user_id",
+    )
+    post_votes: Mapped[list["PostVote"]] = relationship(
+        "PostVote",
+        back_populates="user",
+    )
+    comment_votes: Mapped[list["CommentVote"]] = relationship(
+        "CommentVote",
+        back_populates="user",
+    )
+    reports: Mapped[list["Report"]] = relationship(
+        "Report",
+        back_populates="reporter",
+        foreign_keys="Report.reporter_id",
+    )
+    resolved_reports: Mapped[list["Report"]] = relationship(
+        "Report",
+        back_populates="resolver",
+        foreign_keys="Report.resolved_by",
     )
