@@ -41,6 +41,36 @@ class ReportRepo(BaseRepository[Report, ReportCreate, ReportUpdate]):
         result = await self.session.execute(query)
         return result.scalar_one_or_none()
 
+    async def check_duplicate_within_timeframe(
+        self,
+        reporter_id: int,
+        reportable_type: str,
+        reportable_id: int,
+        since: datetime,
+    ) -> Report | None:
+        """
+        Check if user reported this item within a specific timeframe
+
+        Args:
+            reporter_id (int): The ID of the reporter.
+            reportable_type (str): The type of reportable ('post' or 'comment').
+            reportable_id (int): The ID of the reportable item.
+            since (datetime): Check for reports created after this time.
+
+        Returns:
+            Report | None: Existing report if found, else None.
+        """
+        query = select(self.model).where(
+            and_(
+                self.model.reporter_id == reporter_id,
+                self.model.reportable_type == reportable_type,
+                self.model.reportable_id == reportable_id,
+                self.model.created_at >= since,
+            )
+        )
+        result = await self.session.execute(query)
+        return result.scalar_one_or_none()
+
     async def get_by_status(
         self,
         status: str = "pending",

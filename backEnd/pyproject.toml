@@ -20,6 +20,7 @@ dependencies = [
     "python-jose>=3.5.0",
     "python-multipart>=0.0.21",
     "redis>=7.1.0",
+    "slowapi>=0.1.9",
     "sqlalchemy[asyncio]>=2.0.45",
     "tzdata>=2025.3",
     "uvicorn[standard]>=0.40.0",

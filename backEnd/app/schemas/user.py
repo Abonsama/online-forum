@@ -20,6 +20,8 @@ USER_USERNAME_DESCRIPTION = (
 
 
 class UserRole(StrEnum):
+    """User roles enumeration"""
+
     USER = "user"
     MODERATOR = "moderator"
     ADMIN = "admin"

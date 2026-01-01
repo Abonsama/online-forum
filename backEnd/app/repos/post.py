@@ -160,9 +160,7 @@ class PostRepo(BaseRepository[Post, PostCreate, PostUpdate]):
         Returns:
             bool: True if successful, False otherwise.
         """
-        stmt = text(
-            "UPDATE post SET view_count = view_count + 1 WHERE id = :post_id"
-        )
+        stmt = text("UPDATE post SET view_count = view_count + 1 WHERE id = :post_id")
         result = await self.session.execute(stmt, {"post_id": post_id})
         await self.session.commit()
         return result.rowcount > 0  # type: ignore
@@ -196,9 +194,7 @@ class PostRepo(BaseRepository[Post, PostCreate, PostUpdate]):
         Returns:
             bool: True if successful, False otherwise.
         """
-        stmt = text(
-            "UPDATE post SET vote_count = :vote_count WHERE id = :post_id"
-        )
+        stmt = text("UPDATE post SET vote_count = :vote_count WHERE id = :post_id")
         result = await self.session.execute(
             stmt, {"post_id": post_id, "vote_count": new_vote_count}
         )
@@ -215,9 +211,48 @@ class PostRepo(BaseRepository[Post, PostCreate, PostUpdate]):
         Returns:
             bool: True if successful, False otherwise.
         """
-        stmt = text(
-            "UPDATE post SET is_deleted = true WHERE id = :post_id"
-        )
+        stmt = text("UPDATE post SET is_deleted = true WHERE id = :post_id")
         result = await self.session.execute(stmt, {"post_id": post_id})
         await self.session.commit()
         return result.rowcount > 0  # type: ignore
+
+    async def associate_topics(self, post_id: int, topic_ids: list[int]) -> None:
+        """
+        Associate topics with a post (bulk insert into post_topic junction table)
+
+        Args:
+            post_id (int): The ID of the post.
+            topic_ids (list[int]): List of topic IDs to associate (1-5 topics).
+
+        Raises:
+            ValueError: If topic_ids list is empty or has more than 5 items.
+        """
+        if not topic_ids or len(topic_ids) < 1 or len(topic_ids) > 5:
+            raise ValueError("Must provide between 1 and 5 topic IDs")
+
+        # Bulk insert with ON CONFLICT DO NOTHING to handle duplicates
+        values = [{"post_id": post_id, "topic_id": topic_id} for topic_id in topic_ids]
+
+        stmt = text(
+            """
+            INSERT INTO online_forum.post_topic (post_id, topic_id)
+            VALUES (:post_id, :topic_id)
+            ON CONFLICT (post_id, topic_id) DO NOTHING
+        """
+        )
+
+        for value in values:
+            await self.session.execute(stmt, value)
+
+        await self.session.commit()
+
+    async def remove_associations(self, post_id: int) -> None:
+        """
+        Remove all topic associations for a post
+
+        Args:
+            post_id (int): The ID of the post.
+        """
+        stmt = text("DELETE FROM online_forum.post_topic WHERE post_id = :post_id")
+        await self.session.execute(stmt, {"post_id": post_id})
+        await self.session.commit()

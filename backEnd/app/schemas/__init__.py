@@ -8,12 +8,12 @@ from .comment import (
 )
 from .comment_vote import CommentVoteCreate, CommentVoteResponse, CommentVoteUpdate
 from .health_check import HealthCheckResponse
-from .post import PostCreate, PostDetailResponse, PostFeedResponse, PostResponse, PostUpdate
+from .post import PostCreate, PostFeedResponse, PostResponse, PostUpdate
 from .post_vote import PostVoteCreate, PostVoteResponse, PostVoteUpdate
-from .report import ReportCreate, ReportDetailResponse, ReportResponse, ReportUpdate
+from .report import ReportCreate, ReportResponse, ReportUpdate
 from .token import Token, TokenData, TokenPayload
 from .topic import TopicCreate, TopicResponse, TopicUpdate
-from .user import UserCreate, UserLogin, UserResponse, UserSignup, UserUpdate
+from .user import UserCreate, UserLogin, UserResponse, UserSignup, UserUpdate, UserRole
 
 __all__ = [
     # Base
@@ -27,6 +27,7 @@ __all__ = [
     "UserLogin",
     "UserSignup",
     "UserResponse",
+    "UserRole",
     # Token
     "Token",
     "TokenPayload",
@@ -39,7 +40,6 @@ __all__ = [
     "PostCreate",
     "PostUpdate",
     "PostResponse",
-    "PostDetailResponse",
     "PostFeedResponse",
     # Comment
     "CommentCreate",
@@ -59,5 +59,4 @@ __all__ = [
     "ReportCreate",
     "ReportUpdate",
     "ReportResponse",
-    "ReportDetailResponse",
 ]

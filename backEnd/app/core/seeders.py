@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app import repos
 from app.core.auth import get_password_hash
 from app.core.config import settings
-from app.schemas import UserCreate
+from app.schemas import UserCreate, UserRole
 
 
 async def create_initial_data(db: AsyncSession) -> None:
@@ -26,9 +26,8 @@ async def create_default_users(db: AsyncSession) -> None:
         new_user = UserCreate(
             username=settings.admin_username,
             email=settings.admin_email,
-            hashed_password=get_password_hash(settings.admin_password),
-            first_name=settings.admin_first_name,
-            last_name=settings.admin_last_name,
+            password_hash=get_password_hash(settings.admin_password),
+            role=UserRole.ADMIN,
         )
         await repos.UserRepo(db).create_one(new_user)
         logger.info("Admin user created")

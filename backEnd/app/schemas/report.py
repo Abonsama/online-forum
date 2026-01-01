@@ -46,12 +46,3 @@ class ReportResponse(BaseTimestampSchema):
     resolved_by: int | None
     moderator_note: str | None
     resolved_at: datetime | None
-
-
-class ReportDetailResponse(ReportResponse):
-    """Detailed report schema with relationships"""
-
-    from app.schemas.user import UserResponse
-
-    reporter: UserResponse | None = None
-    resolver: UserResponse | None = None

@@ -33,14 +33,6 @@ class PostResponse(BaseTimestampSchema):
     is_deleted: bool
 
 
-class PostDetailResponse(PostResponse):
-    """Detailed post schema with relationships"""
-
-    from app.schemas.topic import TopicResponse
-    from app.schemas.user import UserResponse
-
-    user: UserResponse | None = None
-    topics: list[TopicResponse] = []
 
 
 class PostFeedResponse(BaseSchema):

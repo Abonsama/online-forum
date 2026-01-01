@@ -125,6 +125,33 @@ class BaseRepository(Generic[Model, CreateSchema, UpdateSchema]):
 
         return result.scalar_one_or_none()
 
+    async def get_all_by_ids(
+        self,
+        obj_ids: Sequence[str | int | uuid.UUID],
+        id_column_name: str = "id",
+    ) -> Sequence[Model]:
+        """
+        Retrieve multiple objects by their IDs.
+
+        Args:
+            obj_ids (Sequence[int | uuid.UUID]): The IDs of the objects to retrieve.
+            id_column_name (str): The name of the ID column in the model.
+
+        Returns:
+            Sequence[Model]: A Sequence of retrieved objects.
+
+        Raises:
+            ValueError: If the id_column_name doesn't exist on the model.
+        """
+        if not obj_ids:
+            return []
+
+        self._validate_column_exists(id_column_name)
+        stmt = select(self.model).where(getattr(self.model, id_column_name).in_(obj_ids))
+        result = await self.session.execute(stmt)
+
+        return result.scalars().all()
+
     async def get_multi_by_ids(
         self,
         skip: int = 0,

@@ -33,9 +33,6 @@ class CommentResponse(BaseTimestampSchema):
 class CommentDetailResponse(CommentResponse):
     """Detailed comment schema with user information"""
 
-    from app.schemas.user import UserResponse
-
-    user: UserResponse | None = None
     user_vote: int | None = None  # 1 for upvote, -1 for downvote, None for no vote
 
 
