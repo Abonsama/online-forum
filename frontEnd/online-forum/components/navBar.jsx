@@ -3,6 +3,7 @@ import Link from 'next/link';
 import React from 'react';
 
 export default function NavBar() {
+    // need to know how to handle search functionality later 
     return(
         <>
             <nav>
