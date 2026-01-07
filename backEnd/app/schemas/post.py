@@ -54,3 +54,12 @@ class PostDetailedResponse(BaseSchema):
     posts: list[PostFeedResponse]
     total: int
     has_more: bool
+
+
+class PostSearchResponse(BaseSchema):
+    """Post search response schema"""
+
+    posts: list[PostFeedResponse]
+    total: int
+    has_more: bool
+    query: str

@@ -17,6 +17,7 @@ from app.schemas import (
     ReportCreate,
     PostDetailedResponse,
     PostFeedResponse,
+    PostSearchResponse,
 )
 from app.services.cache.rate_limiter import rate_limiter
 from app.services.post_service import PostService
@@ -84,11 +85,6 @@ async def get_posts(
         total=len(posts),
         has_more=has_more,
     )
-    # return {
-    #     "posts": posts,
-    #     "total": len(posts),
-    #     "has_more": has_more,
-    # }
 
 
 @router.post(
@@ -153,7 +149,7 @@ async def create_post(
 
 @router.get(
     "/search",
-    response_model=dict,
+    response_model=PostSearchResponse,
     responses={
         status.HTTP_400_BAD_REQUEST: {"model": responses.BadRequestResponse},
     },
@@ -180,13 +176,30 @@ async def search_posts(
         - total: Number of results returned
     """
     service = PostService(db)
-    posts = await service.search_posts(query=q, skip=offset, limit=limit)
+    posts = await service.search_posts(
+        query=q,
+        skip=offset,
+        limit=limit + 1,  # fetch one extra to check has_more
+    )
 
-    return {
-        "posts": posts,
-        "query": q,
-        "total": len(posts),
-    }
+    return PostSearchResponse(
+        posts=[
+            PostFeedResponse(
+                id=post_item.id,
+                user_id=post_item.user_id,
+                title=post_item.title,
+                content=post_item.content,
+                vote_count=post_item.vote_count,
+                view_count=post_item.view_count,
+                comment_count=post_item.comment_count,
+                created_at=post_item.created_at,
+            )
+            for post_item in posts[:limit]
+        ],
+        query=q,
+        total=len(posts) - 1 if len(posts) > limit else len(posts),
+        has_more=len(posts) > limit,
+    )
 
 
 @router.get(

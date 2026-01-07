@@ -8,7 +8,14 @@ from .comment import (
 )
 from .comment_vote import CommentVoteCreate, CommentVoteResponse, CommentVoteUpdate
 from .health_check import HealthCheckResponse
-from .post import PostCreate, PostFeedResponse, PostResponse, PostUpdate, PostDetailedResponse
+from .post import (
+    PostCreate,
+    PostFeedResponse,
+    PostResponse,
+    PostUpdate,
+    PostDetailedResponse,
+    PostSearchResponse,
+)
 from .post_vote import PostVoteCreate, PostVoteResponse, PostVoteUpdate, VoteRequest
 from .report import ReportCreate, ReportResponse, ReportUpdate
 from .token import Token, TokenData, TokenPayload
@@ -43,6 +50,7 @@ __all__ = [
     "PostResponse",
     "PostFeedResponse",
     "PostDetailedResponse",
+    "PostSearchResponse",
     # Comment
     "CommentCreate",
     "CommentUpdate",
